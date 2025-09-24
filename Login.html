@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLOVIA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .strength-meter { height: 100%; width: 0%; transition: width 0.3s ease, background-color 0.3s ease; }
+        .password-weak { background-color: #F44336; width: 33%; }
+        .password-medium { background-color: #FF9800; width: 66%; }
+        .password-strong { background-color: #4CAF50; width: 100%; }
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in-text { animation: fadeIn 1s ease-out 0.5s forwards; opacity: 0; }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <div class="min-h-screen flex">
+        <div class="w-full lg:w-[450px] flex-shrink-0 flex justify-center bg-white p-4 sm:p-6 lg:p-8 h-screen overflow-y-auto shadow-2xl z-30">
+            <div class="max-w-md w-full mt-12">
+                <div id="main-container">
+                    <div class="text-center mb-6">
+                        <img src="logo.jpg" alt="CLAVIS Logo" class="w-48 mx-auto mb-4">
+                        <p class="text-gray-500 text-sm">Create your account</p>
+                    </div>
+
+                    <form id="signup-form">
+                        <div class="mb-4">
+                            <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                                    <i class="fas fa-envelope text-gray-400"></i>
+                                </span>
+                                <input type="email" id="email" placeholder="Enter your email" required class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                                    <i class="fas fa-lock text-gray-400"></i>
+                                </span>
+                                <input type="password" id="password" placeholder="Create a strong password" required class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition">
+                            </div>
+                            <div class="mt-2 h-1.5 rounded-full bg-gray-200 overflow-hidden">
+                                <div class="strength-meter" id="strength-meter"></div>
+                            </div>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-xs text-gray-500" id="strength-text">Password strength</span>
+                                <button type="button" class="text-xs text-purple-600 hover:underline font-medium" id="suggest-password">
+                                    Suggest a strong password
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="my-5 flex items-center">
+                            <div class="flex-grow border-t border-gray-200"></div>
+                            <span class="mx-4 text-xs text-gray-400">Security Verification</span>
+                            <div class="flex-grow border-t border-gray-200"></div>
+                        </div>
+                        
+                        <div class="p-4 bg-gray-50 rounded-md border">
+                            <label for="captcha-input" id="captcha-question" class="block text-center text-sm font-medium text-gray-700 mb-2"></label>
+                            <div class="relative">
+                                 <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                                    <i class="fas fa-calculator text-gray-400"></i>
+                                </span>
+                                <input type="text" id="captcha-input" placeholder="Your Answer" required autocomplete="off" class="w-full text-center pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full mt-5 py-3 px-4 bg-purple-700 text-white font-semibold rounded-md hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition">Create Account</button>
+                    </form>
+
+                    <div class="text-center mt-6 mb-20 text-base">
+                        <span class="text-gray-600">Already have an account?</span>
+                        <a id="login-link" class="font-medium text-purple-600 hover:underline cursor-pointer">Log in</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 hidden lg:flex items-center justify-start relative bg-gray-900">
+             <canvas id="spline-canvas" class="absolute top-0 left-0 w-full h-full"></canvas>
+
+             <div class="absolute bottom-0 right-0 w-40 h-12 bg-gray-900 z-100"></div>
+             <div class="absolute inset-0 bg-black bg-opacity-30 z-10"></div>
+            
+             <div class="relative text-left text-white z-20 p-8 md:p-12 fade-in-text max-w-xl">
+                <h2 class="text-5xl font-bold mb-4">
+                    Explore World at a Tap
+                </h2>
+                <p class="text-lg text-gray-200">
+                    An interactive app for learning geography. Explore a world map and click on any location to discover it through multimedia flashcards featuring facts, images, and cultural audio.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 items-center justify-center" id="login-modal">
+        <div class="relative mx-auto p-8 border w-full max-w-md shadow-lg rounded-md bg-white">
+            <button id="close-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            <div class="text-center">
+                <img src="logo.jpg" alt="CLAVIS Logo" class="w-40 mx-auto mb-4">
+            </div>
+            <div class="mt-4">
+                <form id="login-form">
+                    <div class="mb-4">
+                        <label for="login-email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <div class="relative">
+                             <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                                <i class="fas fa-envelope text-gray-400"></i>
+                            </span>
+                            <input type="email" id="login-email" placeholder="Enter your email" required class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition">
+                        </div>
+                    </div>
+                    <div class="mb-6">
+                        <label for="login-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                         <div class="relative">
+                             <span class="absolute inset-y-0 left-0 flex items-center pl-3">
+                                <i class="fas fa-lock text-gray-400"></i>
+                            </span>
+                            <input type="password" id="login-password" placeholder="Enter your password" required class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full py-2.5 px-4 bg-purple-700 text-white font-semibold rounded-md hover:bg-purple-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition">Login</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const signupForm = document.getElementById('signup-form');
+    const loginForm = document.getElementById('login-form');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const loginEmailInput = document.getElementById('login-email');
+    const loginPasswordInput = document.getElementById('login-password');
+    const strengthMeter = document.getElementById('strength-meter');
+    const strengthText = document.getElementById('strength-text');
+    const loginLink = document.getElementById('login-link');
+    const loginModal = document.getElementById('login-modal');
+    const closeModal = document.getElementById('close-modal');
+    const captchaQuestion = document.getElementById('captcha-question');
+    const captchaInput = document.getElementById('captcha-input');
+
+    let captchaAnswer = 0;
+    generateCaptcha();
+    checkLoginStatus();
+
+    // ---------------------------
+    // Password strength check
+    passwordInput.addEventListener('input', checkPasswordStrength);
+
+    function checkPasswordStrength() {
+        const password = passwordInput.value;
+        let strength = 0;
+        let message = 'Password strength';
+
+        if (password.length > 0) {
+            if (password.length < 6) { strength = 1; message = 'Too short'; }
+            else if (password.length < 10) { strength += 1; }
+            else { strength += 2; }
+            if (/[A-Z]/.test(password)) strength += 1;
+            if (/[0-9]/.test(password)) strength += 1;
+            if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+
+            if (strength < 3) { strengthMeter.className = 'strength-meter password-weak'; message = 'Weak password'; }
+            else if (strength < 5) { strengthMeter.className = 'strength-meter password-medium'; message = 'Medium strength'; }
+            else { strengthMeter.className = 'strength-meter password-strong'; message = 'Strong password!'; }
+        } else {
+            strengthMeter.className = 'strength-meter';
+        }
+        strengthText.textContent = message;
+    }
+
+    // ---------------------------
+    // Signup
+    signupForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        if (!validateForm() || !isCaptchaCompleted()) return;
+
+        try {
+            const res = await fetch('http://localhost:5000/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    email: emailInput.value, 
+                    password: passwordInput.value, 
+                    username: emailInput.value.split('@')[0] // using email prefix as username
+                })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) throw new Error(data.message || 'Signup failed');
+
+            localStorage.setItem('token', data.token);
+            updateUIAfterLogin(data.user.username, data.user.email);
+            alert('Account created successfully!');
+        } catch (err) {
+            alert(err.message);
+        }
+    });
+
+    // ---------------------------
+    // Login
+    loginForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        try {
+            const res = await fetch('http://localhost:5000/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    email: loginEmailInput.value, 
+                    password: loginPasswordInput.value
+                })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Login failed');
+
+            localStorage.setItem('token', data.token);
+            updateUIAfterLogin(data.user.username, data.user.email);
+            loginModal.classList.add('hidden');
+            loginModal.classList.remove('flex');
+            loginForm.reset();
+        } catch (err) {
+            alert(err.message);
+        }
+    });
+
+    // ---------------------------
+    // Fetch profile if logged in
+    async function checkLoginStatus() {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        try {
+            const res = await fetch('http://localhost:5000/api/auth/me', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Session expired');
+            const user = await res.json();
+            updateUIAfterLogin(user.username, user.email);
+        } catch (err) {
+            localStorage.removeItem('token');
+        }
+    }
+
+    // ---------------------------
+    // Update UI
+    function updateUIAfterLogin(username, email) {
+        const mainContainer = document.getElementById('main-container');
+        mainContainer.innerHTML = `
+            <div class="text-center">
+                <img src="https://www.svgrepo.com/show/331488/mongodb.svg" alt="Logo" class="w-10 h-10 mx-auto mb-2">
+                <h1 class="text-2xl font-bold text-gray-800">Welcome to CLAVIS</h1>
+                <p class="text-gray-500 mt-2">You are now logged in</p>
+            </div>
+            <div class="text-center my-6 p-4 bg-gray-50 rounded-md border">
+                <p class="text-sm text-gray-700">Logged in as: <span class="font-medium">${email}</span></p>
+            </div>
+            <button class="w-full py-2.5 px-4 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700" id="logout-btn">Logout</button>
+        `;
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            localStorage.removeItem('token');
+            location.reload();
+        });
+    }
+
+    // ---------------------------
+    // Modal toggle
+    loginLink.addEventListener('click', function() {
+        loginModal.classList.remove('hidden');
+        loginModal.classList.add('flex');
+    });
+    closeModal.addEventListener('click', function() {
+        loginModal.classList.add('hidden');
+        loginModal.classList.remove('flex');
+    });
+    window.addEventListener('click', function(e) {
+        if (e.target === loginModal) {
+            loginModal.classList.add('hidden');
+            loginModal.classList.remove('flex');
+        }
+    });
+
+    // ---------------------------
+    // Validation & captcha
+    function validateForm() {
+        if (!emailInput.value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value)) {
+            alert('Please enter a valid email address.');
+            return false;
+        }
+        if (!passwordInput.value) { alert('Please enter a password.'); return false; }
+        return true;
+    }
+
+    function generateCaptcha() {
+        const num1 = Math.ceil(Math.random() * 10);
+        const num2 = Math.ceil(Math.random() * 10);
+        captchaAnswer = num1 + num2;
+        captchaQuestion.textContent = `What is ${num1} + ${num2}?`;
+    }
+
+    function isCaptchaCompleted() {
+        if (parseInt(captchaInput.value, 10) !== captchaAnswer) {
+            alert('Incorrect security answer. Please try again.');
+            captchaInput.value = '';
+            generateCaptcha();
+            return false;
+        }
+        return true;
+    }
+});
+</script>
+</body>
+</html>
