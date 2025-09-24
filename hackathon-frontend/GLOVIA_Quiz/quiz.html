@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glovia - Random Country Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+        }
+        
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+        
+        /* Header Styles */
+        header {
+            background-color: rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 15px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+        header .container { width: 98%; max-width: none; padding: 0 10px; }
+        header.header-visible { transform: translateY(0); }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #F5F5DC;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin: 0 15px;
+        }
+        
+        nav ul li a {
+            color: #F5F5DC;
+            text-decoration: none;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+        
+        nav ul li a:hover {
+            color: #A8D5A8;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+        }
+        
+        .btn-signup {
+            background-color: #F5F5DC;
+            color: #2E5E2E;
+        }
+        
+        .btn-login {
+            background-color: #3A7A3A;
+            color: #F5F5DC;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        /* Quiz Section Styles */
+        .quiz-section {
+            min-height: 100vh;
+            padding: 100px 0 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1506744038136-46273834b3fb');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .quiz-container {
+            display: flex;
+            width: 100%;
+            max-width: 1400px;
+            gap: 20px;
+        }
+        
+        .quiz-content {
+            flex: 3;
+            background-color: rgba(44, 44, 44, 0.8);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #startScreen {
+            text-align: center;
+        }
+        
+        #startQuizButton {
+            font-size: 20px;
+            padding: 15px 30px;
+            margin-top: 20px;
+        }
+        
+        .leaderboard {
+            flex: 1;
+            background-color: rgba(44, 44, 44, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.1);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .leaderboard h3 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #A8D5A8;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .leaderboard-list {
+            list-style: none;
+        }
+        
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: rgba(58, 122, 58, 0.3);
+            border-radius: 5px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .leaderboard-item:nth-child(1) {
+            background-color: rgba(255, 215, 0, 0.3);
+            border-color: gold;
+        }
+        
+        .leaderboard-item:nth-child(2) {
+            background-color: rgba(192, 192, 192, 0.3);
+            border-color: silver;
+        }
+        
+        .leaderboard-item:nth-child(3) {
+            background-color: rgba(205, 127, 50, 0.3);
+            border-color: #cd7f32;
+        }
+        
+        .quiz-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #A8D5A8;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .quiz-area {
+            display: none;
+            width: 100%;
+        }
+        
+        .question-container {
+            margin-bottom: 25px;
+        }
+        
+        .question-text {
+            font-size: 22px;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        
+        .option {
+            background-color: rgba(58, 122, 58, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .option:hover {
+            background-color: rgba(168, 213, 168, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .option.correct {
+            background-color: rgba(76, 175, 80, 0.5);
+            border-color: #4CAF50;
+        }
+        
+        .option.incorrect {
+            background-color: rgba(244, 67, 54, 0.5);
+            border-color: #F44336;
+        }
+        
+        .quiz-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .hint-container {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: rgba(255, 193, 7, 0.2);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 193, 7, 0.5);
+            display: none;
+        }
+        
+        .hint-text {
+            font-style: italic;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #A8D5A8;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .quiz-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .score-display {
+            font-size: 24px;
+            text-align: center;
+            margin: 20px 0;
+            color: #A8D5A8;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .results-container {
+            text-align: center;
+            display: none;
+        }
+        
+        .result-message {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #A8D5A8;
+        }
+        
+        .result-score {
+            font-size: 48px;
+            margin: 20px 0;
+            color: #F5F5DC;
+        }
+        
+        .celebration {
+            font-size: 60px;
+            margin: 20px 0;
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        /* Footer */
+        footer {
+            background-color: #2E5E2E;
+            color: #F5F5DC;
+            padding: 30px 0;
+            text-align: center;
+        }
+        
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .footer-links a {
+            color: #F5F5DC;
+            text-decoration: none;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .quiz-container {
+                flex-direction: column;
+            }
+            
+            .leaderboard {
+                order: -1;
+                margin-bottom: 20px;
+                max-height: 200px;
+            }
+            
+            .question-text {
+                font-size: 18px;
+            }
+            
+            .header-content {
+                flex-direction: column;
+            }
+            
+            nav ul {
+                margin: 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">GLOViA</div>
+                <nav>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#quiz">Quiz</a></li>
+                        <li><a href="#leaderboard">Leaderboard</a></li>
+                    </ul>
+                </nav>
+                <div class="auth-buttons">
+                    <a href="#" class="btn btn-signup">Sign Up</a>
+                    <a href="#" class="btn btn-login">Login</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="quiz-section" id="quiz">
+        <div class="container">
+            <h2 class="quiz-title" id="quizTitle">Country Knowledge Challenge</h2>
+            <div class="quiz-container">
+                <div class="quiz-content">
+                    <div id="startScreen">
+                         <button id="startQuizButton" class="btn btn-signup">Start a Random Quiz</button>
+                    </div>
+                    
+                    <div class="quiz-area" id="quizArea">
+                        <div class="quiz-stats">
+                            <div class="current-score">Score: <span id="currentScore">0</span></div>
+                            <div class="question-count">Question: <span id="currentQuestion">1</span>/<span id="totalQuestions">10</span></div>
+                        </div>
+                        
+                        <div class="progress-bar">
+                            <div class="progress" id="progressBar"></div>
+                        </div>
+                        
+                        <div class="question-container">
+                            <div class="question-text" id="questionText"></div>
+                            <div class="options-container" id="optionsContainer"></div>
+                        </div>
+                        
+                        <div class="hint-container" id="hintContainer">
+                            <div class="hint-text" id="hintText"></div>
+                        </div>
+                        
+                        <div class="quiz-controls">
+                            <button class="btn btn-login" id="hintButton">Get Hint (-2 pts)</button>
+                            <button class="btn btn-signup" id="nextButton">Next Question</button>
+                        </div>
+                    </div>
+                    
+                    <div class="results-container" id="resultsContainer">
+                        <div class="result-message" id="resultMessage"></div>
+                        <div class="celebration" id="celebrationEmoji">🎉</div>
+                        <div class="result-score">Your Score: <span id="finalScore">0</span></div>
+                        <button class="btn btn-signup" id="restartButton">Play Again</button>
+                    </div>
+                </div>
+                
+                <div class="leaderboard" id="leaderboard">
+                    <h3>Leaderboard (High Scores)</h3>
+                    <ul class="leaderboard-list" id="leaderboardList">
+                        </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">GLOViA</div>
+                <div class="footer-links">
+                    <a href="#">Home</a>
+                    <a href="#quiz">Quiz</a>
+                    <a href="#leaderboard">Leaderboard</a>
+                    <a href="#">About Us</a>
+                </div>
+                <p>GloVia. Explore the world through knowledge.</p>
+            </div>
+        </div>
+    </footer>
+
+    <audio id="correctSound" src="https://www.soundjay.com/buttons/sounds/button-3.mp3" preload="auto"></audio>
+    <audio id="incorrectSound" src="https://www.soundjay.com/buttons/sounds/button-10.mp3" preload="auto"></audio>
+    <audio id="completionSound" src="https://www.soundjay.com/misc/sounds/magic-chime-01.mp3" preload="auto"></audio>
+
+    <script>
+        const quizData = {
+            "United States": [
+                { question: "Which river is the longest in the United States?", options: ["Mississippi", "Missouri", "Colorado", "Ohio"], correctAnswer: 1, hint: "It's a major tributary of the river it's often confused with." },
+                { question: "The Golden Gate Bridge is a famous landmark in which U.S. city?", options: ["New York", "Los Angeles", "San Francisco", "Chicago"], correctAnswer: 2, hint: "This city is known for its steep rolling hills and cable cars." },
+                { question: "What is the national bird of the United States?", options: ["Bald Eagle", "Turkey", "American Robin", "Blue Jay"], correctAnswer: 0, hint: "This bird of prey appears on the Great Seal." }
+            ],
+            "China": [
+                { question: "What is the capital of China?", options: ["Shanghai", "Beijing", "Hong Kong", "Tianjin"], correctAnswer: 1, hint: "This city hosted the 2008 Summer Olympics." },
+                { question: "Which invention is NOT credited to ancient China?", options: ["Gunpowder", "Papermaking", "The telephone", "The compass"], correctAnswer: 2, hint: "This invention revolutionized long-distance communication in the 19th century." },
+                { question: "The Terracotta Army was discovered in which Chinese city?", options: ["Beijing", "Xi'an", "Shanghai", "Guangzhou"], correctAnswer: 1, hint: "This city was the ancient capital of China for several dynasties." }
+            ],
+            "India": [
+                { question: "Which famous monument, a symbol of love, is located in Agra, India?", options: ["Hawa Mahal", "Qutub Minar", "Taj Mahal", "India Gate"], correctAnswer: 2, hint: "It's a white marble mausoleum built by a Mughal emperor." },
+                { question: "What is the national animal of India?", options: ["Lion", "Bengal Tiger", "Elephant", "Peacock"], correctAnswer: 1, hint: "This large cat is known for its distinctive stripes." },
+                { question: "The film industry based in Mumbai is popularly known as what?", options: ["Hollywood", "Tollywood", "Bollywood", "Nollywood"], correctAnswer: 2, hint: "The name is a portmanteau of Bombay (the former name for Mumbai) and Hollywood." }
+            ],
+            "Russia": [
+                { question: "Which country is the largest in the world by land area?", options: ["China", "United States", "Russia", "Canada"], correctAnswer: 2, hint: "This country spans 11 time zones across Eastern Europe and Northern Asia." },
+                { question: "The famous Bolshoi Ballet is based in which Russian city?", options: ["Saint Petersburg", "Moscow", "Kazan", "Novosibirsk"], correctAnswer: 1, hint: "This city is the capital of Russia." },
+                { question: "What is the name of the deepest lake in the world, located in Siberia?", options: ["Lake Superior", "Lake Baikal", "Lake Victoria", "Caspian Sea"], correctAnswer: 1, hint: "It contains about 20% of the world's unfrozen freshwater." }
+            ],
+            "Brazil": [
+                { question: "What is the official language of Brazil?", options: ["Spanish", "Portuguese", "Brazilian", "English"], correctAnswer: 1, hint: "This country was colonized by a European nation famous for its explorers." },
+                { question: "The famous Christ the Redeemer statue overlooks which Brazilian city?", options: ["São Paulo", "Brasília", "Salvador", "Rio de Janeiro"], correctAnswer: 3, hint: "This city is famous for its Carnival festival and Copacabana beach." },
+                { question: "The largest rainforest in the world, the Amazon, is primarily located in which country?", options: ["Peru", "Colombia", "Ecuador", "Brazil"], correctAnswer: 3, hint: "This country covers a significant portion of South America." }
+            ],
+            "Japan": [
+                { question: "What is the capital city of Japan?", options: ["Kyoto", "Osaka", "Tokyo", "Hiroshima"], correctAnswer: 2, hint: "It's one of the most populous metropolitan areas in the world." },
+                { question: "Which iconic mountain, an active volcano, is Japan's highest peak?", options: ["Mount Everest", "Mount Fuji", "Mount Kita", "Mount Hotaka"], correctAnswer: 1, hint: "It's often depicted in Japanese art and is a symbol of the country." },
+                { question: "The Japanese art of paper folding is known as what?", options: ["Ikebana", "Bonsai", "Origami", "Sumo"], correctAnswer: 2, hint: "It transforms a flat sheet of paper into a finished sculpture." }
+            ],
+            "Egypt": [
+                { question: "The Great Pyramid of Giza is located near which modern Egyptian city?", options: ["Alexandria", "Luxor", "Cairo", "Aswan"], correctAnswer: 2, hint: "This is the capital city of Egypt." },
+                { question: "What is the name of the river that has been the lifeline of Egypt for millennia?", options: ["Tigris", "Euphrates", "Jordan", "Nile"], correctAnswer: 3, hint: "It is the longest river in Africa." },
+                { question: "Ancient Egyptians developed a writing system using pictorial symbols known as what?", options: ["Cuneiform", "Hieroglyphs", "Alphabet", "Runes"], correctAnswer: 1, hint: "These symbols were famously deciphered using the Rosetta Stone." }
+            ],
+            "Australia": [
+                { question: "What is the capital city of Australia?", options: ["Sydney", "Melbourne", "Canberra", "Perth"], correctAnswer: 2, hint: "It's a planned city, unlike the country's larger coastal metropolises." },
+                { question: "Which unique Australian mammal lays eggs?", options: ["Kangaroo", "Koala", "Wombat", "Platypus"], correctAnswer: 3, hint: "This semi-aquatic animal has a bill like a duck." },
+                { question: "The Great Barrier Reef is located off the coast of which Australian state?", options: ["Victoria", "Queensland", "New South Wales", "Western Australia"], correctAnswer: 1, hint: "This state is in the northeast of the country." }
+            ],
+            "Canada": [
+                { question: "What two languages are the official languages of Canada?", options: ["English & Spanish", "English & German", "English & French", "English & Mandarin"], correctAnswer: 2, hint: "One of these languages is primarily spoken in the province of Quebec." },
+                { question: "Which natural wonder is shared between Canada and the United States?", options: ["Grand Canyon", "Niagara Falls", "Yellowstone Park", "Rocky Mountains"], correctAnswer: 1, hint: "It consists of three large waterfalls on a shared border." },
+                { question: "What is the national animal of Canada?", options: ["Moose", "Polar Bear", "Beaver", "Canadian Goose"], correctAnswer: 2, hint: "This rodent is known for building dams." }
+            ],
+            "Italy": [
+                { question: "The ancient city of Pompeii was famously destroyed by the eruption of which volcano?", options: ["Mount Etna", "Stromboli", "Mount Vesuvius", "Mount Pelée"], correctAnswer: 2, hint: "This volcano overlooks the Bay of Naples." },
+                { question: "What is the capital city of Italy?", options: ["Milan", "Venice", "Florence", "Rome"], correctAnswer: 3, hint: "This city is home to the Colosseum and the Vatican." },
+                { question: "Which of these pasta shapes originated in Italy?", options: ["Spaghetti", "Ramen", "Udon", "Pho"], correctAnswer: 0, hint: "It is a long, thin, solid, cylindrical noodle." }
+            ]
+        };
+
+        // DOM Elements
+        const startScreen = document.getElementById('startScreen');
+        const startQuizButton = document.getElementById('startQuizButton');
+        const quizArea = document.getElementById('quizArea');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const hintContainer = document.getElementById('hintContainer');
+        const hintText = document.getElementById('hintText');
+        const hintButton = document.getElementById('hintButton');
+        const nextButton = document.getElementById('nextButton');
+        const restartButton = document.getElementById('restartButton');
+        const currentScore = document.getElementById('currentScore');
+        const currentQuestion = document.getElementById('currentQuestion');
+        const totalQuestions = document.getElementById('totalQuestions');
+        const progressBar = document.getElementById('progressBar');
+        const finalScore = document.getElementById('finalScore');
+        const resultMessage = document.getElementById('resultMessage');
+        const celebrationEmoji = document.getElementById('celebrationEmoji');
+        const leaderboardList = document.getElementById('leaderboardList');
+        const quizTitle = document.getElementById('quizTitle');
+
+        // Quiz state variables
+        let selectedCountry = '';
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let questions = [];
+        let hintUsed = false;
+
+        const countryFlags = { "United States": "🇺🇸", "China": "🇨🇳", "India": "🇮🇳", "Russia": "🇷🇺", "Brazil": "🇧🇷", "Japan": "🇯🇵", "Egypt": "🇪🇬", "Australia": "🇦🇺", "Canada": "🇨🇦", "Italy": "🇮🇹" };
+
+        function initQuiz() {
+            startQuizButton.addEventListener('click', startRandomQuiz);
+            hintButton.addEventListener('click', showHint);
+            nextButton.addEventListener('click', nextQuestion);
+            restartButton.addEventListener('click', restartQuiz);
+            loadLeaderboard();
+        }
+
+        function startRandomQuiz() {
+            const countries = Object.keys(quizData);
+            const randomCountry = countries[Math.floor(Math.random() * countries.length)];
+            setupQuizForCountry(randomCountry);
+        }
+
+        function setupQuizForCountry(country) {
+            selectedCountry = country;
+            quizTitle.innerHTML = `${countryFlags[country] || '🌍'} ${country} Challenge`;
+            
+            questions = [...quizData[country]];
+            currentQuestionIndex = 0;
+            score = 0;
+            hintUsed = false;
+            
+            currentScore.textContent = score;
+            totalQuestions.textContent = questions.length;
+            
+            startScreen.style.display = 'none';
+            quizArea.style.display = 'block';
+            resultsContainer.style.display = 'none';
+            
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const question = questions[currentQuestionIndex];
+            
+            currentQuestion.textContent = currentQuestionIndex + 1;
+            progressBar.style.width = `${((currentQuestionIndex) / questions.length) * 100}%`;
+            
+            questionText.textContent = question.question;
+            
+            optionsContainer.innerHTML = '';
+            hintContainer.style.display = 'none';
+            hintUsed = false;
+            hintButton.disabled = false;
+            
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.addEventListener('click', () => selectAnswer(index));
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            nextButton.disabled = true;
+        }
+
+        function selectAnswer(selectedIndex) {
+            const question = questions[currentQuestionIndex];
+            const options = document.querySelectorAll('.option');
+            
+            options.forEach(option => { option.style.pointerEvents = 'none'; });
+            
+            const isCorrect = selectedIndex === question.correctAnswer;
+            
+            options[question.correctAnswer].classList.add('correct');
+            
+            if (!isCorrect) {
+                options[selectedIndex].classList.add('incorrect');
+                document.getElementById('incorrectSound').play();
+            } else {
+                score += 10;
+                currentScore.textContent = score;
+                document.getElementById('correctSound').play();
+            }
+            
+            progressBar.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+            nextButton.disabled = false;
+        }
+
+        function showHint() {
+            if (hintUsed) return;
+            const question = questions[currentQuestionIndex];
+            hintText.textContent = question.hint;
+            hintContainer.style.display = 'block';
+            hintUsed = true;
+            hintButton.disabled = true;
+            score = Math.max(0, score - 2);
+            currentScore.textContent = score;
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizArea.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            finalScore.textContent = score;
+            
+            const percentage = (score / (questions.length * 10)) * 100;
+            if (percentage >= 80) {
+                resultMessage.textContent = "Excellent! You're a geography expert!";
+                celebrationEmoji.textContent = "🏆";
+            } else if (percentage >= 60) {
+                resultMessage.textContent = "Great job! You know your stuff!";
+                celebrationEmoji.textContent = "👍";
+            } else {
+                resultMessage.textContent = "Good effort! Keep exploring the world!";
+                celebrationEmoji.textContent = "🌍";
+            }
+            
+            document.getElementById('completionSound').play();
+            updateLeaderboard(selectedCountry, score);
+        }
+
+        function restartQuiz() {
+            quizTitle.textContent = 'Country Knowledge Challenge';
+            startScreen.style.display = 'block';
+            quizArea.style.display = 'none';
+            resultsContainer.style.display = 'none';
+        }
+
+        function loadLeaderboard() {
+            const leaderboard = JSON.parse(localStorage.getItem('gloviaLeaderboard')) || {};
+            leaderboardList.innerHTML = '';
+
+            const sortedLeaderboard = Object.entries(leaderboard).sort(([,a],[,b]) => b-a);
+            
+            if (sortedLeaderboard.length === 0) {
+                const emptyMessage = document.createElement('li');
+                emptyMessage.textContent = "No scores yet. Be the first!";
+                emptyMessage.style.textAlign = 'center';
+                emptyMessage.style.padding = '20px';
+                leaderboardList.appendChild(emptyMessage);
+                return;
+            }
+
+            for (const [country, score] of sortedLeaderboard) {
+                const item = document.createElement('li');
+                item.className = 'leaderboard-item';
+                item.innerHTML = `
+                    <span>${countryFlags[country] || '🌍'} ${country}</span>
+                    <span>${score}</span>
+                `;
+                leaderboardList.appendChild(item);
+            }
+        }
+
+        function updateLeaderboard(country, newScore) {
+            const leaderboard = JSON.parse(localStorage.getItem('gloviaLeaderboard')) || {};
+            if (!leaderboard[country] || newScore > leaderboard[country]) {
+                leaderboard[country] = newScore;
+                localStorage.setItem('gloviaLeaderboard', JSON.stringify(leaderboard));
+                loadLeaderboard();
+            }
+        }
+
+        (function() {
+            const header = document.querySelector('header');
+            let lastScrollY = window.scrollY;
+            let isMouseNearTop = false;
+            const PROXIMITY_PX = 80;
+
+            function updateHeaderVisibility() {
+                const scrollingUp = window.scrollY < lastScrollY;
+                const atTop = window.scrollY <= 0;
+                if (atTop || scrollingUp || isMouseNearTop) {
+                    header.classList.add('header-visible');
+                } else {
+                    header.classList.remove('header-visible');
+                }
+                lastScrollY = window.scrollY;
+            }
+
+            window.addEventListener('scroll', updateHeaderVisibility, { passive: true });
+            window.addEventListener('mousemove', (e) => {
+                isMouseNearTop = e.clientY <= PROXIMITY_PX;
+                if (isMouseNearTop) header.classList.add('header-visible');
+            });
+            window.addEventListener('load', () => {
+                header.classList.add('header-visible');
+                lastScrollY = window.scrollY;
+            });
+        })();
+
+        document.addEventListener('DOMContentLoaded', initQuiz);
+    </script>
+</body>
+</html>
